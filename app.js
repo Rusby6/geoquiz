@@ -1,16 +1,13 @@
-// Variables globales
 let map;
 let marcadores = [];
 let datosPueblo = [];
 let puntuacion = 0;
-let puebloActual = '';
+let puebloActual = 'javea'; // o "denia" si prefieres otro por defecto
 let preguntasRespondidas = new Set();
 const PUNTOS_POR_RESPUESTA = 10;
 
-// Elementos del DOM
 const elementos = {
   mapa: document.getElementById('mapa'),
-  selectorPueblo: document.getElementById('selector-pueblo'),
   panelPregunta: document.getElementById('pregunta-panel'),
   tituloLugar: document.getElementById('titulo-lugar'),
   descripcion: document.getElementById('descripcion'),
@@ -18,24 +15,44 @@ const elementos = {
   opcionesContainer: document.getElementById('opciones-container'),
   feedback: document.getElementById('feedback'),
   btnVolver: document.getElementById('btn-volver'),
-  puntosDisplay: document.getElementById('puntos')
+  puntosDisplay: document.getElementById('puntos') // opcional si quieres mostrarlo
 };
 
-// Inicialización
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initMap();
-  setupEventListeners();
+  await cargarDatosPueblo(puebloActual);
 });
 
+let userMarker = null;
+
 function initMap() {
-  map = L.map(elementos.mapa).setView([38.7896, 0.1666], 12);
+  map = L.map(elementos.mapa).setView([38.7896, 0.1666], 13);
+
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
 
-  // Activar seguimiento de posición
   if (navigator.geolocation) {
-    navigator.geolocation.watchPosition(onUserPosition, null, {
+    navigator.geolocation.watchPosition((position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+
+      if (userMarker) {
+        userMarker.setLatLng([lat, lng]);
+      } else {
+        userMarker = L.marker([lat, lng], {
+          icon: L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+          })
+        }).addTo(map).bindPopup('Tu ubicación');
+
+        map.setView([lat, lng], 16);
+      }
+
+      onUserPosition(position);
+    }, null, {
       enableHighAccuracy: true,
       maximumAge: 0,
       timeout: 27000
@@ -43,18 +60,9 @@ function initMap() {
   }
 }
 
-function setupEventListeners() {
-  elementos.selectorPueblo.addEventListener('change', async (e) => {
-    puebloActual = e.target.value;
-    if (puebloActual) {
-      await cargarDatosPueblo(puebloActual);
-    }
-  });
-
-  elementos.btnVolver.addEventListener('click', () => {
-    elementos.panelPregunta.classList.add('hidden');
-  });
-}
+elementos.btnVolver.addEventListener('click', () => {
+  elementos.panelPregunta.classList.add('hidden');
+});
 
 async function cargarDatosPueblo(nombrePueblo) {
   try {
@@ -66,7 +74,7 @@ async function cargarDatosPueblo(nombrePueblo) {
     actualizarPuntuacion(0);
   } catch (error) {
     console.error("Error cargando datos:", error);
-    alert(`Error al cargar ${nombrePueblo}.json. ¿Está en GitHub?`);
+    alert(`Error al cargar ${nombrePueblo}.json.`);
   }
 }
 
@@ -89,11 +97,6 @@ function mostrarMarcadores() {
 
     marcadores.push(marker);
   });
-
-  if (datosPueblo.length > 0) {
-    const group = new L.featureGroup(marcadores);
-    map.fitBounds(group.getBounds().pad(0.2));
-  }
 }
 
 function onUserPosition(position) {
@@ -177,5 +180,7 @@ async function mostrarPreguntasSecuenciales(lugar, claveLugar) {
 
 function actualizarPuntuacion(nuevaPuntuacion) {
   puntuacion = nuevaPuntuacion;
-  elementos.puntosDisplay.textContent = puntuacion;
+  if (elementos.puntosDisplay) {
+    elementos.puntosDisplay.textContent = puntuacion;
+  }
 }
