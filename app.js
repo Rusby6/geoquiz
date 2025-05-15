@@ -4,6 +4,7 @@ let marcadores = [];
 let datosPueblo = [];
 let puntuacion = 0;
 let puebloActual = '';
+let preguntasRespondidas = new Set();
 const PUNTOS_POR_RESPUESTA = 10;
 
 // Elementos del DOM
@@ -27,15 +28,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initMap() {
-  // Mapa centrado en la zona de Jávea/Denia por defecto
   map = L.map(elementos.mapa).setView([38.7896, 0.1666], 12);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
+
+  // Activar seguimiento de posición
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(onUserPosition, null, {
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 27000
+    });
+  }
 }
 
 function setupEventListeners() {
-  // Cambio de pueblo
   elementos.selectorPueblo.addEventListener('change', async (e) => {
     puebloActual = e.target.value;
     if (puebloActual) {
@@ -43,7 +51,6 @@ function setupEventListeners() {
     }
   });
 
-  // Botón volver
   elementos.btnVolver.addEventListener('click', () => {
     elementos.panelPregunta.classList.add('hidden');
   });
@@ -51,14 +58,12 @@ function setupEventListeners() {
 
 async function cargarDatosPueblo(nombrePueblo) {
   try {
-    // Cargar desde GitHub (asegúrate de que la URL sea correcta)
     const response = await fetch(`https://raw.githubusercontent.com/Rusby6/geoquiz/main/${nombrePueblo}.json`);
-    
     if (!response.ok) throw new Error('No se pudo cargar el pueblo');
-    
     datosPueblo = await response.json();
+    preguntasRespondidas.clear();
     mostrarMarcadores();
-    actualizarPuntuacion(0); // Resetear puntuación al cambiar de pueblo
+    actualizarPuntuacion(0);
   } catch (error) {
     console.error("Error cargando datos:", error);
     alert(`Error al cargar ${nombrePueblo}.json. ¿Está en GitHub?`);
@@ -66,11 +71,9 @@ async function cargarDatosPueblo(nombrePueblo) {
 }
 
 function mostrarMarcadores() {
-  // Limpiar marcadores anteriores
   marcadores.forEach(m => map.removeLayer(m));
   marcadores = [];
 
-  // Añadir nuevos marcadores
   datosPueblo.forEach((lugar, index) => {
     const marker = L.marker([lugar.coordenadas.lat, lugar.coordenadas.lng], {
       icon: L.divIcon({
@@ -80,66 +83,96 @@ function mostrarMarcadores() {
         iconAnchor: [15, 42]
       })
     })
-    .addTo(map)
-    .bindPopup(`<b>${lugar.titulo}</b><br>Click para jugar`)
-    .on('click', () => mostrarPregunta(lugar));
+      .addTo(map)
+      .bindPopup(`<b>${lugar.titulo}</b><br>Click para jugar`)
+      .on('click', () => mostrarPreguntasSecuenciales(lugar, `${puebloActual}-${index}`));
 
     marcadores.push(marker);
   });
 
-  // Ajustar vista para mostrar todos los marcadores
   if (datosPueblo.length > 0) {
     const group = new L.featureGroup(marcadores);
     map.fitBounds(group.getBounds().pad(0.2));
   }
 }
 
-function mostrarPregunta(lugar) {
-  // Mostrar datos del lugar
-  elementos.tituloLugar.textContent = lugar.titulo;
-  elementos.descripcion.textContent = lugar.descripcion || "Sin descripción";
-  
-  // Mostrar la primera pregunta (puedes modificar para elegir aleatoria)
-  const pregunta = lugar.preguntas[0]; 
-  elementos.preguntaTexto.textContent = pregunta.texto;
-  
-  // Generar opciones
-  elementos.opcionesContainer.innerHTML = '';
-  pregunta.opciones.forEach((opcion, index) => {
-    const boton = document.createElement('button');
-    boton.className = 'opcion-btn';
-    boton.textContent = opcion;
-    boton.dataset.index = index;
-    boton.addEventListener('click', () => validarRespuesta(index, pregunta.correcta));
-    elementos.opcionesContainer.appendChild(boton);
+function onUserPosition(position) {
+  const userLat = position.coords.latitude;
+  const userLng = position.coords.longitude;
+
+  datosPueblo.forEach((lugar, index) => {
+    const distancia = getDistanceFromLatLng(userLat, userLng, lugar.coordenadas.lat, lugar.coordenadas.lng);
+    const claveLugar = `${puebloActual}-${index}`;
+    if (distancia <= 50 && !preguntasRespondidas.has(claveLugar)) {
+      preguntasRespondidas.add(claveLugar);
+      mostrarPreguntasSecuenciales(lugar, claveLugar);
+    }
   });
-  
-  // Mostrar panel
-  elementos.panelPregunta.classList.remove('hidden');
-  elementos.feedback.textContent = '';
 }
 
-function validarRespuesta(respuestaIndex, correctaIndex) {
-  const opciones = document.querySelectorAll('.opcion-btn');
-  
-  // Deshabilitar todos los botones
-  opciones.forEach(btn => {
-    btn.disabled = true;
-    btn.classList.remove('selected');
-  });
-  
-  // Resaltar selección
-  opciones[respuestaIndex].classList.add('selected');
-  
-  // Verificar respuesta
-  if (respuestaIndex === correctaIndex) {
-    elementos.feedback.textContent = "✅ Correcto!";
-    elementos.feedback.className = "correct";
-    actualizarPuntuacion(puntuacion + PUNTOS_POR_RESPUESTA);
-  } else {
-    elementos.feedback.textContent = `❌ Incorrecto! La respuesta correcta es: ${opciones[correctaIndex].textContent}`;
-    elementos.feedback.className = "incorrect";
+function getDistanceFromLatLng(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+async function mostrarPreguntasSecuenciales(lugar, claveLugar) {
+  let indicePregunta = 0;
+
+  async function mostrarSiguientePregunta() {
+    if (indicePregunta >= lugar.preguntas.length) {
+      elementos.panelPregunta.classList.add('hidden');
+      return;
+    }
+
+    const pregunta = lugar.preguntas[indicePregunta];
+    elementos.tituloLugar.textContent = lugar.titulo;
+    elementos.descripcion.textContent = lugar.descripcion || "Sin descripción";
+    elementos.preguntaTexto.textContent = pregunta.texto;
+    elementos.opcionesContainer.innerHTML = '';
+    elementos.feedback.textContent = '';
+
+    pregunta.opciones.forEach((opcion, index) => {
+      const boton = document.createElement('button');
+      boton.className = 'opcion-btn';
+      boton.textContent = opcion;
+      boton.dataset.index = index;
+      boton.addEventListener('click', () => {
+        validarRespuestaSecuencial(index, pregunta.correcta);
+      });
+      elementos.opcionesContainer.appendChild(boton);
+    });
+
+    elementos.panelPregunta.classList.remove('hidden');
   }
+
+  function validarRespuestaSecuencial(respuestaIndex, correctaIndex) {
+    const opciones = document.querySelectorAll('.opcion-btn');
+    opciones.forEach(btn => btn.disabled = true);
+    opciones[respuestaIndex].classList.add('selected');
+
+    if (respuestaIndex === correctaIndex) {
+      elementos.feedback.textContent = "✅ Correcto!";
+      elementos.feedback.className = "correct";
+      actualizarPuntuacion(puntuacion + PUNTOS_POR_RESPUESTA);
+    } else {
+      elementos.feedback.textContent = `❌ Incorrecto! La respuesta correcta es: ${opciones[correctaIndex].textContent}`;
+      elementos.feedback.className = "incorrect";
+    }
+
+    setTimeout(() => {
+      indicePregunta++;
+      mostrarSiguientePregunta();
+    }, 2000);
+  }
+
+  mostrarSiguientePregunta();
 }
 
 function actualizarPuntuacion(nuevaPuntuacion) {
