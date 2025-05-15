@@ -2,7 +2,7 @@ let map;
 let marcadores = [];
 let datosPueblo = [];
 let puntuacion = 0;
-let puebloActual = 'javea'; // o "denia" si prefieres otro por defecto
+let puebloActual = 'javea';
 let preguntasRespondidas = new Set();
 const PUNTOS_POR_RESPUESTA = 10;
 
@@ -15,7 +15,7 @@ const elementos = {
   opcionesContainer: document.getElementById('opciones-container'),
   feedback: document.getElementById('feedback'),
   btnVolver: document.getElementById('btn-volver'),
-  puntosDisplay: document.getElementById('puntos') // opcional si quieres mostrarlo
+  puntosDisplay: document.getElementById('puntos')
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -29,7 +29,7 @@ function initMap() {
   map = L.map(elementos.mapa).setView([38.7896, 0.1666], 13);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
 
   if (navigator.geolocation) {
@@ -37,17 +37,17 @@ function initMap() {
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
 
+      // Crear o mover el marcador del usuario
+      const iconoUsuario = L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/149/149995.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+
       if (userMarker) {
         userMarker.setLatLng([lat, lng]);
       } else {
-        userMarker = L.marker([lat, lng], {
-          icon: L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
-          })
-        }).addTo(map).bindPopup('Tu ubicación');
-
+        userMarker = L.marker([lat, lng], { icon: iconoUsuario }).addTo(map).bindPopup('Estás aquí');
         map.setView([lat, lng], 16);
       }
 
