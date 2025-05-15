@@ -1,67 +1,33 @@
-/* Estilos generales */
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+html, body {
   margin: 0;
   padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #f0f2f5;
   color: #333;
 }
 
-.app-container {
-  max-width: 100%;
-  padding: 15px;
-  box-sizing: border-box;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: #2c3e50;
-}
-
-.score {
-  background: #3498db;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 20px;
-  font-weight: bold;
-}
-
-/* Selector de pueblo */
-.pueblo-selector-container {
-  margin-bottom: 15px;
-}
-
-#selector-pueblo {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid #3498db;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-/* Mapa */
 #mapa {
-  width: 100%;
-  height: 300px;
-  border-radius: 10px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  margin-bottom: 15px;
+  height: 100vh;
+  width: 100vw;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
 }
 
-/* Panel de pregunta */
 #pregunta-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   background: white;
-  border-radius: 10px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
   padding: 15px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 -3px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
 }
 
 .pregunta-header {
@@ -120,7 +86,6 @@ h1 {
   color: #e74c3c;
 }
 
-/* Botones */
 button {
   padding: 12px 20px;
   border: none;
@@ -128,11 +93,6 @@ button {
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.btn-primary {
-  background: #3498db;
-  color: white;
 }
 
 .btn-secondary {
@@ -144,13 +104,7 @@ button {
   display: none;
 }
 
-/* Responsive para tablets/desktop */
 @media (min-width: 600px) {
-  .app-container {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-  
   .opciones-grid {
     grid-template-columns: 1fr 1fr;
   }
