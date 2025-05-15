@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GeoQuiz Móvil</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Cabecera con puntuación -->
+    <header>
+      <h1>GeoQuiz</h1>
+      <div class="score">Puntos: <span id="puntos">0</span></div>
+    </header>
+
+    <!-- Selector de pueblo -->
+    <div class="pueblo-selector-container">
+      <select id="selector-pueblo">
+        <option value="">-- Selecciona pueblo --</option>
+        <option value="javea">Javea</option>
+        <option value="denia">Denia</option>
+      </select>
+    </div>
+
+    <!-- Mapa -->
+    <div id="mapa"></div>
+
+    <!-- Panel de pregunta -->
+    <div id="pregunta-panel" class="hidden">
+      <div class="pregunta-header">
+        <h2 id="titulo-lugar"></h2>
+        <p id="descripcion"></p>
+      </div>
+      <div class="pregunta-content">
+        <h3>Pregunta:</h3>
+        <p id="pregunta-texto"></p>
+        <div id="opciones-container" class="opciones-grid"></div>
+      </div>
+      <div id="feedback"></div>
+      <button id="btn-volver" class="btn-secondary">Volver al mapa</button>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

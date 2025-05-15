@@ -1,0 +1,107 @@
+[
+  {
+    "titulo": "Iglesia San Bartolome",
+    "coordenadas": {
+      "lat": 38.789089636535266,
+      "lng": 0.16344845294952395
+    },
+    "preguntas": [
+      {
+        "texto": "En que siglo se construyó esta iglesia?",
+        "opciones": [
+          "XV",
+          "XVIII",
+          "XVII",
+          "XVI"
+        ],
+        "correcta": 3
+      }
+    ]
+  },
+  {
+    "titulo": "Mercadona",
+    "coordenadas": {
+      "lat": 38.788905657574084,
+      "lng": 0.1685607433319092
+    },
+    "preguntas": [
+      {
+        "texto": "De que color es el logo de Mercadona?",
+        "opciones": [
+          "Azul",
+          "Verde",
+          "Rojo",
+          "Amarillo"
+        ],
+        "correcta": 1
+      }
+    ]
+  },
+  {
+    "titulo": "Aldi",
+    "coordenadas": {
+      "lat": 38.787212192564695,
+      "lng": 0.17455279827117923
+    },
+    "preguntas": [
+      {
+        "texto": "Este Aldi tiene parking?",
+        "opciones": [
+          "No",
+          "Si",
+          "A veces",
+          "Eso no existe"
+        ],
+        "correcta": 1
+      }
+    ]
+  },
+  {
+    "titulo": "Instituto",
+    "coordenadas": {
+      "lat": 38.78847079632383,
+      "lng": 0.1781737804412842
+    },
+    "preguntas": [
+      {
+        "texto": "Como se llama este Insti?",
+        "opciones": [
+          "IES Antoni Llido",
+          "IES La mar",
+          "IES Javea",
+          "IES Educacion"
+        ],
+        "correcta": 1
+      }
+    ]
+  },
+  {
+    "titulo": "Casa",
+    "coordenadas": {
+      "lat": 38.78642189512735,
+      "lng": 0.16455888748168945
+    },
+    "preguntas": [
+      {
+        "texto": "4+4?",
+        "opciones": [
+          "2",
+          "4",
+          "6",
+          "8"
+        ],
+        "correcta": 3
+      },
+      {
+        "texto": "4-4",
+        "opciones": [
+          "3",
+          "1",
+          "0",
+          "22"
+        ],
+        "correcta": 2
+      }
+    ]
+  }
+]

@@ -1,0 +1,157 @@
+/* Estilos generales */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+.app-container {
+  max-width: 100%;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #2c3e50;
+}
+
+.score {
+  background: #3498db;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+/* Selector de pueblo */
+.pueblo-selector-container {
+  margin-bottom: 15px;
+}
+
+#selector-pueblo {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+/* Mapa */
+#mapa {
+  width: 100%;
+  height: 300px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 15px;
+}
+
+/* Panel de pregunta */
+#pregunta-panel {
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+.pregunta-header {
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+#titulo-lugar {
+  margin: 0;
+  color: #2c3e50;
+}
+
+#descripcion {
+  color: #7f8c8d;
+  font-size: 0.9rem;
+}
+
+.opciones-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.opcion-btn {
+  padding: 12px;
+  border: none;
+  background: #ecf0f1;
+  border-radius: 8px;
+  font-size: 1rem;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.opcion-btn:hover {
+  background: #d6eaf8;
+}
+
+.opcion-btn.selected {
+  background: #3498db;
+  color: white;
+}
+
+#feedback {
+  margin: 15px 0;
+  font-weight: bold;
+  min-height: 20px;
+}
+
+.correct {
+  color: #27ae60;
+}
+
+.incorrect {
+  color: #e74c3c;
+}
+
+/* Botones */
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #3498db;
+  color: white;
+}
+
+.btn-secondary {
+  background: #95a5a6;
+  color: white;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Responsive para tablets/desktop */
+@media (min-width: 600px) {
+  .app-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .opciones-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

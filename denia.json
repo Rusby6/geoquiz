@@ -1,0 +1,21 @@
+[
+  {
+    "titulo": "Puero Denia",
+    "coordenadas": {
+      "lat": 38.84512256738108,
+      "lng": 0.11346817016601564
+    },
+    "preguntas": [
+      {
+        "texto": "a",
+        "opciones": [
+          "a",
+          "a",
+          "a",
+          "a"
+        ],
+        "correcta": 1
+      }
+    ]
+  }
+]
