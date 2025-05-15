@@ -59,8 +59,8 @@
   {
     "titulo": "Instituto",
     "coordenadas": {
-      "lat": 38.78847079632383,
-      "lng": 0.1781737804412842
+      "lat": 38.78873004085002,
+      "lng": 0.17807722091674807
     },
     "preguntas": [
       {
@@ -72,6 +72,16 @@
           "IES Educacion"
         ],
         "correcta": 1
+      },
+      {
+        "texto": "Que es el sol?",
+        "opciones": [
+          "Estrella",
+          "Nombre",
+          "Solo en valenciano",
+          "Todas son correctas"
+        ],
+        "correcta": 0
       }
     ]
   },
