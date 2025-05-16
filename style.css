@@ -15,6 +15,7 @@
   --color-text: #e6e6e6;
   --color-text-muted: #b3b3b3;
   --color-border: #2d3748;
+  --color-gold: #ffd700;
 }
 
 html, body {
@@ -38,7 +39,63 @@ html, body {
   border: none;
 }
 
-/* Panel inferior para preguntas */
+/* Panel de puntos */
+#puntos-container {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(26, 26, 46, 0.9);
+  padding: 10px 15px;
+  border-radius: 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(5px);
+}
+
+#puntos {
+  font-weight: bold;
+  color: var(--color-success);
+  font-size: 1.2rem;
+  margin-right: 5px;
+  transition: all 0.3s ease;
+}
+
+#puntos-extra {
+  position: absolute;
+  top: -25px;
+  right: 0;
+  font-size: 0.9rem;
+  color: var(--color-gold);
+  font-weight: bold;
+}
+
+/* Selector de pueblo */
+#selector-pueblo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  background: rgba(26, 26, 46, 0.9);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(5px);
+}
+
+#select-pueblo {
+  background: var(--color-bg-light);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 0.9rem;
+}
+
+/* Panel de preguntas */
 #pregunta-panel {
   position: absolute;
   bottom: 0;
@@ -51,6 +108,8 @@ html, body {
   box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.4);
   z-index: 1000;
   border-top: 1px solid var(--color-border);
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .pregunta-header {
@@ -96,6 +155,7 @@ html, body {
   text-align: left;
   color: var(--color-text);
   transition: background 0.2s ease, transform 0.1s ease;
+  cursor: pointer;
 }
 
 .opcion-btn:hover {
@@ -109,18 +169,34 @@ html, body {
   color: #fff;
 }
 
+.opcion-btn.correct {
+  background: var(--color-success);
+  border-color: var(--color-success-dark);
+  color: white;
+}
+
+.opcion-btn.incorrect {
+  background: var(--color-danger);
+  border-color: var(--color-danger-dark);
+  color: white;
+}
+
 #feedback {
   font-weight: bold;
   min-height: 20px;
   margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 6px;
 }
 
 .correct {
   color: var(--color-success);
+  background: rgba(40, 167, 69, 0.1);
 }
 
 .incorrect {
   color: var(--color-danger);
+  background: rgba(220, 53, 69, 0.1);
 }
 
 button {
@@ -147,13 +223,35 @@ button {
   display: none;
 }
 
+/* Animaciones */
+@keyframes puntosGanados {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.5); }
+  100% { transform: scale(1); }
+}
+
+@keyframes puntosFlotantes {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-30px); }
+}
+
+.ganando-puntos {
+  animation: puntosGanados 0.5s ease;
+  color: var(--color-gold) !important;
+}
+
+.mostrando-puntos-extra {
+  display: block !important;
+  animation: puntosFlotantes 1s ease-out forwards;
+}
+
 @media (min-width: 600px) {
   .opciones-grid {
     grid-template-columns: 1fr 1fr;
   }
 }
 
-/* Estilo del scroll en listas */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
