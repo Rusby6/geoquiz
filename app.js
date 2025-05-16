@@ -5,8 +5,9 @@ let puntuacion = 0;
 let puebloActual = 'javea';
 let preguntasRespondidas = new Set();
 const PUNTOS_POR_RESPUESTA = 10;
-const PUNTOS_PENALIZACION = 5; // Puntos que se restan por respuesta incorrecta
+const PUNTOS_PENALIZACION = 5;
 let rachaCorrectas = 0;
+let pueblosDisponibles = {}; // Almacenará qué pueblos están disponibles
 
 const elementos = {
   mapa: document.getElementById('mapa'),
@@ -17,6 +18,7 @@ const elementos = {
   opcionesContainer: document.getElementById('opciones-container'),
   feedback: document.getElementById('feedback'),
   btnVolver: document.getElementById('btn-volver'),
+  btnMinimizar: document.getElementById('btn-minimizar'),
   puntosDisplay: document.getElementById('puntos'),
   puntosContainer: document.getElementById('puntos-container'),
   puntosExtra: document.getElementById('puntos-extra'),
@@ -25,11 +27,13 @@ const elementos = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Verificar disponibilidad de pueblos
+  await verificarPueblosDisponibles();
   initMap();
   await cargarDatosPueblo(puebloActual);
   
-  // Evento para cambiar de pueblo
   elementos.selectPueblo.addEventListener('change', async (e) => {
+    if (e.target.value === puebloActual) return;
     puebloActual = e.target.value;
     const config = PUEBLOS[puebloActual];
     if (config) {
@@ -37,7 +41,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     await cargarDatosPueblo(puebloActual);
   });
+
+  // Evento para minimizar panel
+  elementos.btnMinimizar.addEventListener('click', () => {
+    elementos.panelPregunta.classList.toggle('panel-minimizado');
+  });
 });
+
+// Verificar qué archivos JSON existen
+async function verificarPueblosDisponibles() {
+  const pueblos = Object.keys(PUEBLOS);
+  
+  for (const pueblo of pueblos) {
+    try {
+      const response = await fetch(`https://raw.githubusercontent.com/Rusby6/geoquiz/main/${pueblo}.json`, { method: 'HEAD' });
+      pueblosDisponibles[pueblo] = response.ok;
+    } catch (error) {
+      pueblosDisponibles[pueblo] = false;
+    }
+  }
+  
+  // Actualizar el selector de pueblos
+  const select = elementos.selectPueblo;
+  for (let i = 0; i < select.options.length; i++) {
+    const option = select.options[i];
+    if (!pueblosDisponibles[option.value] && option.value !== puebloActual) {
+      option.disabled = true;
+      option.textContent += ' (no disponible)';
+    }
+  }
+}
 
 const PUEBLOS = {
   javea: {
@@ -66,7 +99,6 @@ const PUEBLOS = {
     zoom: 14
   }
 };
-
 let userMarker = null;
 
 function initMap() {
