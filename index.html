@@ -9,6 +9,20 @@
 </head>
 <body>
   <div id="mapa"></div>
+  
+  <!-- Contenedor de puntos -->
+  <div id="puntos-container">
+    <span id="puntos">0</span> puntos
+    <div id="puntos-extra" class="hidden"></div>
+  </div>
+
+  <!-- Selector de pueblo -->
+  <div id="selector-pueblo">
+    <select id="select-pueblo">
+      <option value="javea">Jávea</option>
+      <!-- Puedes añadir más opciones aquí -->
+    </select>
+  </div>
 
   <div id="pregunta-panel" class="hidden">
     <div class="pregunta-header">
@@ -24,7 +38,6 @@
     <button id="btn-volver" class="btn-secondary">Volver al mapa</button>
   </div>
 
-  
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="app.js"></script>
 </body>
