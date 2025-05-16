@@ -16,6 +16,7 @@
   --color-text-muted: #b3b3b3;
   --color-border: #2d3748;
   --color-gold: #ffd700;
+  --color-bronze: #cd7f32;
 }
 
 html, body {
@@ -39,20 +40,29 @@ html, body {
   border: none;
 }
 
-/* Panel de puntos */
-#puntos-container {
+/* Header container */
+#header-container {
   position: absolute;
   top: 20px;
   right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  z-index: 1000;
+}
+
+/* Puntos container */
+#puntos-container {
   background: rgba(26, 26, 46, 0.9);
   padding: 10px 15px;
   border-radius: 20px;
-  z-index: 1000;
   display: flex;
   align-items: center;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   border: 1px solid var(--color-border);
   backdrop-filter: blur(5px);
+  position: relative;
 }
 
 #puntos {
@@ -68,16 +78,11 @@ html, body {
   top: -25px;
   right: 0;
   font-size: 0.9rem;
-  color: var(--color-gold);
   font-weight: bold;
 }
 
 /* Selector de pueblo */
 #selector-pueblo {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 1000;
   background: rgba(26, 26, 46, 0.9);
   padding: 10px;
   border-radius: 8px;
@@ -91,8 +96,15 @@ html, body {
   color: var(--color-text);
   border: 1px solid var(--color-border);
   border-radius: 4px;
-  padding: 5px 10px;
+  padding: 8px 12px;
   font-size: 0.9rem;
+  width: 120px;
+  cursor: pointer;
+}
+
+#select-pueblo option {
+  background: var(--color-bg-light);
+  color: var(--color-text);
 }
 
 /* Panel de preguntas */
@@ -235,14 +247,35 @@ button {
   100% { opacity: 0; transform: translateY(-30px); }
 }
 
+@keyframes puntosPerdidos {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
 .ganando-puntos {
   animation: puntosGanados 0.5s ease;
   color: var(--color-gold) !important;
 }
 
+.perdiendo-puntos {
+  animation: puntosPerdidos 0.4s ease;
+  color: var(--color-danger) !important;
+}
+
 .mostrando-puntos-extra {
   display: block !important;
   animation: puntosFlotantes 1s ease-out forwards;
+}
+
+.puntos-positivos {
+  color: var(--color-gold);
+}
+
+.puntos-negativos {
+  color: var(--color-danger);
 }
 
 @media (min-width: 600px) {
