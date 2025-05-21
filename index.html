@@ -26,6 +26,17 @@
         <option value="benidorm">Benidorm</option>
       </select>
     </div>
+
+    <!-- Nuevo contenedor de distancia -->
+    <div id="distancia-container" class="hidden">
+      <div id="distancia-info">
+        <span id="distancia-texto">Marcador más cercano:</span>
+        <span id="distancia-valor">--- m</span>
+      </div>
+      <div id="distancia-progreso">
+        <div id="distancia-barra"></div>
+      </div>
+    </div>
   </div>
 
   <div id="pregunta-panel" class="hidden">
@@ -45,9 +56,5 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="app.js"></script>
-  <div id="distancia-cercana" class="hidden">
-  <span id="distancia-texto">Marcador más cercano: </span>
-  <span id="distancia-valor">0 m</span>
-</div>
 </body>
 </html>
