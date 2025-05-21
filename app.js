@@ -179,20 +179,49 @@ function mostrarMarcadores() {
 function onUserPosition(position) {
   const userLat = position.coords.latitude;
   const userLng = position.coords.longitude;
+  let distanciaMinima = Infinity;
+  let marcadorCercano = null;
 
   datosPueblo.forEach((lugar, index) => {
     const distancia = getDistanceFromLatLng(userLat, userLng, lugar.coordenadas.lat, lugar.coordenadas.lng);
     const claveLugar = `${puebloActual}-${index}`;
     
-    // Actualizar el popup con la distancia
-    const distanciaElement = document.getElementById(`distancia-${claveLugar}`);
-    if (distanciaElement) {
-      distanciaElement.textContent = `A ${Math.round(distancia)} metros`;
+    // Actualizar distancia mínima
+    if (distancia < distanciaMinima) {
+      distanciaMinima = distancia;
+      marcadorCercano = lugar;
     }
     
     if (distancia <= 50 && !preguntasRespondidas.has(claveLugar)) {
       preguntasRespondidas.add(claveLugar);
       mostrarPreguntasSecuenciales(lugar, claveLugar);
+    }
+  });
+
+  // Mostrar distancia al marcador más cercano
+  const distanciaElement = document.getElementById('distancia-valor');
+  const contenedorDistancia = document.getElementById('distancia-cercana');
+  
+  if (distanciaMinima < Infinity) {
+    distanciaElement.textContent = `${Math.round(distanciaMinima)} m`;
+    contenedorDistancia.classList.remove('hidden');
+    
+    // Opcional: resaltar el marcador más cercano
+    resaltarMarcadorCercano(marcadorCercano);
+  } else {
+    contenedorDistancia.classList.add('hidden');
+  }
+}
+
+// Función opcional para resaltar el marcador más cercano
+function resaltarMarcadorCercano(lugar) {
+  marcadores.forEach(marker => {
+    const latlng = marker.getLatLng();
+    if (latlng.lat === lugar.coordenadas.lat && latlng.lng === lugar.coordenadas.lng) {
+      marker.setZIndexOffset(1000); // Traer al frente
+      marker.openPopup(); // Opcional: abrir popup
+    } else {
+      marker.setZIndexOffset(0);
     }
   });
 }
