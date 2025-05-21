@@ -7,7 +7,8 @@ let preguntasRespondidas = new Set();
 const PUNTOS_POR_RESPUESTA = 10;
 const PUNTOS_PENALIZACION = 5;
 let rachaCorrectas = 0;
-let pueblosDisponibles = {}; // Almacenará qué pueblos están disponibles
+let pueblosDisponibles = {};
+let userMarker = null;
 
 const elementos = {
   mapa: document.getElementById('mapa'),
@@ -23,11 +24,13 @@ const elementos = {
   puntosContainer: document.getElementById('puntos-container'),
   puntosExtra: document.getElementById('puntos-extra'),
   selectPueblo: document.getElementById('select-pueblo'),
-  headerContainer: document.getElementById('header-container')
+  headerContainer: document.getElementById('header-container'),
+  distanciaContainer: document.getElementById('distancia-container'),
+  distanciaValor: document.getElementById('distancia-valor'),
+  distanciaBarra: document.getElementById('distancia-barra')
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Verificar disponibilidad de pueblos
   await verificarPueblosDisponibles();
   initMap();
   await cargarDatosPueblo(puebloActual);
@@ -42,13 +45,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cargarDatosPueblo(puebloActual);
   });
 
-  // Evento para minimizar panel
   elementos.btnMinimizar.addEventListener('click', () => {
     elementos.panelPregunta.classList.toggle('panel-minimizado');
   });
 });
 
-// Verificar qué archivos JSON existen
 async function verificarPueblosDisponibles() {
   const pueblos = Object.keys(PUEBLOS);
   
@@ -61,7 +62,6 @@ async function verificarPueblosDisponibles() {
     }
   }
   
-  // Actualizar el selector de pueblos
   const select = elementos.selectPueblo;
   for (let i = 0; i < select.options.length; i++) {
     const option = select.options[i];
@@ -99,7 +99,6 @@ const PUEBLOS = {
     zoom: 14
   }
 };
-let userMarker = null;
 
 function initMap() {
   const config = PUEBLOS[puebloActual] || PUEBLOS.javea;
@@ -142,6 +141,8 @@ elementos.btnVolver.addEventListener('click', () => {
 
 async function cargarDatosPueblo(nombrePueblo) {
   try {
+    elementos.distanciaContainer.classList.add('hidden');
+    
     const response = await fetch(`https://raw.githubusercontent.com/Rusby6/geoquiz/main/${nombrePueblo}.json`);
     if (!response.ok) throw new Error('No se pudo cargar el pueblo');
     datosPueblo = await response.json();
@@ -160,17 +161,22 @@ function mostrarMarcadores() {
   marcadores = [];
 
   datosPueblo.forEach((lugar, index) => {
+    const claveLugar = `${puebloActual}-${index}`;
+    const respondido = preguntasRespondidas.has(claveLugar);
+    
     const marker = L.marker([lugar.coordenadas.lat, lugar.coordenadas.lng], {
       icon: L.divIcon({
-        className: 'custom-marker',
+        className: respondido ? 'custom-marker marker-respondido' : 'custom-marker',
         html: `<div class="marker-pin">${index + 1}</div>`,
         iconSize: [30, 42],
         iconAnchor: [15, 42]
       })
     })
       .addTo(map)
-      .bindPopup(`<b>${lugar.titulo}</b><br><span class="distancia-info" id="distancia-${puebloActual}-${index}">Calculando distancia...</span><br>Click para jugar`)
-      .on('click', () => mostrarPreguntasSecuenciales(lugar, `${puebloActual}-${index}`));
+      .bindPopup(`<b>${lugar.titulo}</b><br>${respondido ? 'Pregunta ya respondida' : 'Click para jugar'}`)
+      .on('click', () => {
+        if (!respondido) mostrarPreguntasSecuenciales(lugar, claveLugar);
+      });
 
     marcadores.push(marker);
   });
@@ -183,13 +189,14 @@ function onUserPosition(position) {
   let marcadorCercano = null;
 
   datosPueblo.forEach((lugar, index) => {
-    const distancia = getDistanceFromLatLng(userLat, userLng, lugar.coordenadas.lat, lugar.coordenadas.lng);
     const claveLugar = `${puebloActual}-${index}`;
+    if (preguntasRespondidas.has(claveLugar)) return;
     
-    // Actualizar distancia mínima
+    const distancia = getDistanceFromLatLng(userLat, userLng, lugar.coordenadas.lat, lugar.coordenadas.lng);
+    
     if (distancia < distanciaMinima) {
       distanciaMinima = distancia;
-      marcadorCercano = lugar;
+      marcadorCercano = { lugar, index, distancia };
     }
     
     if (distancia <= 50 && !preguntasRespondidas.has(claveLugar)) {
@@ -198,32 +205,28 @@ function onUserPosition(position) {
     }
   });
 
-  // Mostrar distancia al marcador más cercano
-  const distanciaElement = document.getElementById('distancia-valor');
-  const contenedorDistancia = document.getElementById('distancia-cercana');
-  
-  if (distanciaMinima < Infinity) {
-    distanciaElement.textContent = `${Math.round(distanciaMinima)} m`;
-    contenedorDistancia.classList.remove('hidden');
+  // Actualizar UI de distancia
+  if (marcadorCercano && marcadorCercano.distancia < 1000) {
+    elementos.distanciaValor.textContent = `${Math.round(marcadorCercano.distancia)} m`;
     
-    // Opcional: resaltar el marcador más cercano
-    resaltarMarcadorCercano(marcadorCercano);
-  } else {
-    contenedorDistancia.classList.add('hidden');
-  }
-}
-
-// Función opcional para resaltar el marcador más cercano
-function resaltarMarcadorCercano(lugar) {
-  marcadores.forEach(marker => {
-    const latlng = marker.getLatLng();
-    if (latlng.lat === lugar.coordenadas.lat && latlng.lng === lugar.coordenadas.lng) {
-      marker.setZIndexOffset(1000); // Traer al frente
-      marker.openPopup(); // Opcional: abrir popup
+    // Barra de progreso (inversa: 100% lejos, 0% cerca)
+    const progreso = Math.min(100, (marcadorCercano.distancia / 500) * 100);
+    elementos.distanciaBarra.style.width = `${progreso}%`;
+    
+    // Cambiar color según proximidad
+    if (marcadorCercano.distancia < 100) {
+      elementos.distanciaContainer.classList.add('cerca');
+      elementos.distanciaBarra.style.background = 'var(--color-success)';
     } else {
-      marker.setZIndexOffset(0);
+      elementos.distanciaContainer.classList.remove('cerca');
+      elementos.distanciaBarra.style.background = 
+        'linear-gradient(90deg, var(--color-danger), var(--color-success))';
     }
-  });
+    
+    elementos.distanciaContainer.classList.remove('hidden');
+  } else {
+    elementos.distanciaContainer.classList.add('hidden');
+  }
 }
 
 function getDistanceFromLatLng(lat1, lng1, lat2, lng2) {
@@ -239,6 +242,7 @@ function getDistanceFromLatLng(lat1, lng1, lat2, lng2) {
 }
 
 async function mostrarPreguntasSecuenciales(lugar, claveLugar) {
+  elementos.distanciaContainer.classList.add('hidden');
   let indicePregunta = 0;
 
   async function mostrarSiguientePregunta() {
@@ -272,15 +276,12 @@ async function mostrarPreguntasSecuenciales(lugar, claveLugar) {
     const opciones = document.querySelectorAll('.opcion-btn');
     opciones.forEach(btn => btn.disabled = true);
     
-    // Marcar la opción seleccionada
     opciones[respuestaIndex].classList.add('selected');
     
-    // Marcar la opción correcta e incorrecta
     if (respuestaIndex === correctaIndex) {
       opciones[respuestaIndex].classList.add('correct');
       rachaCorrectas++;
       
-      // Calcular puntos ganados (base + bonus por racha)
       const puntosBase = PUNTOS_POR_RESPUESTA;
       const bonusRacha = rachaCorrectas > 2 ? Math.floor(rachaCorrectas / 2) : 0;
       const puntosGanados = puntosBase + bonusRacha;
@@ -293,14 +294,13 @@ async function mostrarPreguntasSecuenciales(lugar, claveLugar) {
       opciones[respuestaIndex].classList.add('incorrect');
       opciones[correctaIndex].classList.add('correct');
       
-      // Restar puntos por respuesta incorrecta
       const puntosPerdidos = PUNTOS_PENALIZACION;
       rachaCorrectas = 0;
       
       elementos.feedback.innerHTML = `❌ <strong>Incorrecto!</strong> -${puntosPerdidos} puntos<br>La respuesta correcta es: <strong>${opciones[correctaIndex].textContent}</strong>`;
       elementos.feedback.className = "incorrect";
       mostrarPuntosExtra(`-${puntosPerdidos}`, 'puntos-negativos');
-      actualizarPuntuacion(Math.max(0, puntuacion - puntosPerdidos)); // No permitir puntuación negativa
+      actualizarPuntuacion(Math.max(0, puntuacion - puntosPerdidos));
     }
 
     setTimeout(() => {
@@ -327,7 +327,6 @@ function actualizarPuntuacion(nuevaPuntuacion) {
   if (elementos.puntosDisplay) {
     elementos.puntosDisplay.textContent = puntuacion;
     
-    // Aplicar animación según si ganó o perdió puntos
     if (diferencia > 0) {
       elementos.puntosDisplay.classList.add('ganando-puntos');
       setTimeout(() => {
