@@ -386,3 +386,7 @@ option:disabled {
   font-weight: bold;
   font-size: 1rem;
 }
+
+.hidden {
+  display: none;
+}
