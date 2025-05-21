@@ -169,7 +169,7 @@ function mostrarMarcadores() {
       })
     })
       .addTo(map)
-      .bindPopup(`<b>${lugar.titulo}</b><br>Click para jugar`)
+      .bindPopup(`<b>${lugar.titulo}</b><br><span class="distancia-info" id="distancia-${puebloActual}-${index}">Calculando distancia...</span><br>Click para jugar`)
       .on('click', () => mostrarPreguntasSecuenciales(lugar, `${puebloActual}-${index}`));
 
     marcadores.push(marker);
@@ -183,6 +183,13 @@ function onUserPosition(position) {
   datosPueblo.forEach((lugar, index) => {
     const distancia = getDistanceFromLatLng(userLat, userLng, lugar.coordenadas.lat, lugar.coordenadas.lng);
     const claveLugar = `${puebloActual}-${index}`;
+    
+    // Actualizar el popup con la distancia
+    const distanciaElement = document.getElementById(`distancia-${claveLugar}`);
+    if (distanciaElement) {
+      distanciaElement.textContent = `A ${Math.round(distancia)} metros`;
+    }
+    
     if (distancia <= 50 && !preguntasRespondidas.has(claveLugar)) {
       preguntasRespondidas.add(claveLugar);
       mostrarPreguntasSecuenciales(lugar, claveLugar);
