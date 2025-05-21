@@ -107,6 +107,49 @@ html, body {
   color: var(--color-text);
 }
 
+/* Distancia container */
+#distancia-container {
+  background: rgba(26, 26, 46, 0.9);
+  padding: 12px 15px;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--color-border);
+  backdrop-filter: blur(5px);
+  width: 200px;
+  margin-top: 10px;
+}
+
+#distancia-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+#distancia-texto {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+#distancia-valor {
+  color: var(--color-info);
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+#distancia-progreso {
+  height: 6px;
+  background: var(--color-bg-light);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#distancia-barra {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--color-danger), var(--color-success));
+  transition: width 0.5s ease;
+}
+
 /* Panel de preguntas */
 #pregunta-panel {
   position: absolute;
@@ -255,6 +298,12 @@ button {
   100% { transform: translateX(0); }
 }
 
+@keyframes latido {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
 .ganando-puntos {
   animation: puntosGanados 0.5s ease;
   color: var(--color-gold) !important;
@@ -276,6 +325,10 @@ button {
 
 .puntos-negativos {
   color: var(--color-danger);
+}
+
+.cerca {
+  animation: latido 1.5s infinite;
 }
 
 @media (min-width: 600px) {
@@ -355,82 +408,9 @@ option:disabled {
   color: var(--color-text-muted);
   background-color: var(--color-bg-light);
 }
-.distancia-info {
-  font-size: 0.9rem;
-  color: var(--color-info);
-  font-weight: normal;
-}
-#distancia-cercana {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  background: rgba(26, 26, 46, 0.9);
-  padding: 10px 15px;
-  border-radius: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--color-border);
-  backdrop-filter: blur(5px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
 
-#distancia-texto {
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
-}
-
-#distancia-valor {
-  color: var(--color-info);
-  font-weight: bold;
-  font-size: 1rem;
-}
-
-.hidden {
-  display: none;
-}
-
-
-#distancia-container {
-  background: rgba(26, 26, 46, 0.9);
-  padding: 12px 15px;
-  border-radius: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--color-border);
-  backdrop-filter: blur(5px);
-  width: 200px;
-  margin-top: 10px;
-}
-
-#distancia-info {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-
-#distancia-progreso {
-  height: 6px;
-  background: var(--color-bg-light);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-#distancia-barra {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--color-danger), var(--color-success));
-  transition: width 0.5s ease;
-}
-
-/* Animación cuando estás muy cerca */
-@keyframes latido {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-.cerca {
-  animation: latido 1.5s infinite;
+/* Marcadores respondidos */
+.marker-respondido .marker-pin {
+  background-color: var(--color-secondary) !important;
+  opacity: 0.7;
 }
