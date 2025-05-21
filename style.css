@@ -355,3 +355,8 @@ option:disabled {
   color: var(--color-text-muted);
   background-color: var(--color-bg-light);
 }
+.distancia-info {
+  font-size: 0.9rem;
+  color: var(--color-info);
+  font-weight: normal;
+}
